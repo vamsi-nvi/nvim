@@ -21,6 +21,7 @@ vim.opt.winborder = "single"
 vim.opt.wrap = true
 vim.opt.swapfile = false
 vim.opt.backup = false
+vim.opt.background = "dark"
 
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = function()

@@ -9,15 +9,40 @@ if not vim.loop.fs_stat(lazypath) then
 		lazypath,
 	})
 end
+
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+
+	{ "rose-pine/neovim" },
+	{ "folke/tokyonight.nvim" },
+
 	{
-		"folke/tokyonight.nvim",
-		"vague-theme/vague.nvim",
+		"nvim-tree/nvim-web-devicons",
 		lazy = false,
-		priority = 1000,
-		opts = {},
+		opts = { default = true, strict = true },
+	},
+
+	{
+		"lewis6991/gitsigns.nvim",
+		opts = {
+			-- signs = {
+			-- 	add = { text = "+" },
+			-- 	change = { text = "~" },
+			-- 	delete = { text = "_" },
+			-- 	topdelete = { text = "‾" },
+			-- 	changedelete = { text = "~" },
+			-- },
+		},
+	},
+
+	{
+		"brenoprata10/nvim-highlight-colors",
+		opts = {
+			render = "virtual",
+			virtual_symbol_position = "inline",
+			enable_tailwind = true,
+		},
 	},
 
 	{
@@ -55,85 +80,43 @@ require("lazy").setup({
 		end,
 	},
 
-	{
-		"kawre/neotab.nvim",
-		event = "InsertEnter",
-		opts = {},
-	},
-
-	{
-		"lewis6991/gitsigns.nvim",
-		config = function()
-			require("gitsigns").setup({
-				signs = {
-					add = { text = "+" },
-					change = { text = "~" },
-					delete = { text = "_" },
-					topdelete = { text = "‾" },
-					changedelete = { text = "~" },
-				},
-			})
-		end,
-	},
-
-	{
-		"nvim-tree/nvim-web-devicons",
-		lazy = false,
-		priority = 1001,
-		opts = {
-			default = true,
-			strict = true,
-		},
-	},
-
+	-- ========================================================================
+	-- Snacks (picker, explorer, notifier, etc.)
+	-- ========================================================================
 	{
 		"folke/snacks.nvim",
 		priority = 1001,
 		lazy = false,
 		---@type snacks.Config
 		opts = {
-			-- your configuration comes here
-			-- or leave it empty to use the default settings
-			-- refer to the configuration section below
 			bigfile = { enabled = false },
-			dashboard = {
-				enabled = false,
-				preset = {
-					header = [[
-
-      ███╗   ██╗██╗   ██╗
-      ████╗  ██║██║   ██║
-      ██╔██╗ ██║██║   ██║
-      ██║╚██╗██║╚██╗ ██╔╝
-      ██║ ╚████║ ╚████╔╝ 
-      ╚═╝  ╚═══╝  ╚═══╝  
-                     
-                     
-          ]],
-				},
-			},
+			dashboard = { enabled = true },
 			explorer = { enabled = true },
 			indent = { enabled = true },
 			input = { enabled = true },
-			picker = {
-				enabled = true,
-				sources = {
-					explorer = {
-						layout = {
-							layout = {
-								width = 30,
-							},
-						},
-					},
-				},
-			},
 			notifier = { enabled = true },
 			quickfile = { enabled = false },
 			scope = { enabled = false },
 			scroll = { enabled = false },
 			statuscolumn = { enabled = false },
 			words = { enabled = false },
+			picker = {
+				enabled = true,
+				sources = {
+					explorer = {
+						hidden = true,
+						ignored = true,
+						layout = { layout = { width = 30 } },
+					},
+				},
+			},
 		},
+	},
+
+	{
+		"kawre/neotab.nvim",
+		event = "InsertEnter",
+		opts = {},
 	},
 
 	{
@@ -186,7 +169,7 @@ require("lazy").setup({
 	},
 
 	-- ========================================================================
-	-- LSP & Completion
+	-- LSP
 	-- ========================================================================
 	{
 		"neovim/nvim-lspconfig",
@@ -194,25 +177,16 @@ require("lazy").setup({
 			{ "williamboman/mason.nvim", opts = {} },
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
-
 			{ "j-hui/fidget.nvim", opts = {} },
 		},
-
 		config = function()
 			vim.diagnostic.config({
-				virtual_text = {
-					enabled = true,
-					spacing = 4,
-					prefix = "■",
-				},
+				virtual_text = { enabled = true, spacing = 4, prefix = " ■" },
 				signs = true,
 				underline = true,
 				update_in_insert = false,
 				severity_sort = true,
-				float = {
-					border = "rounded",
-					source = "if_many",
-				},
+				float = { border = "rounded", source = "if_many" },
 			})
 
 			vim.api.nvim_create_autocmd("LspAttach", {
@@ -220,10 +194,7 @@ require("lazy").setup({
 				callback = function(event)
 					local map = function(keys, func, desc, mode)
 						mode = mode or "n"
-						vim.keymap.set(mode, keys, func, {
-							buffer = event.buf,
-							desc = "LSP: " .. desc,
-						})
+						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 					end
 
 					map("gd", function()
@@ -239,14 +210,12 @@ require("lazy").setup({
 						Snacks.picker.lsp_type_definitions()
 					end, "Goto type definition")
 					map("gD", vim.lsp.buf.declaration, "Goto declaration")
-
 					map("<leader>ds", function()
 						Snacks.picker.lsp_symbols()
 					end, "Document symbols")
 					map("<leader>ws", function()
 						Snacks.picker.lsp_workspace_symbols()
 					end, "Workspace symbols")
-
 					map("<leader>rn", vim.lsp.buf.rename, "Rename")
 					map("<leader>ca", vim.lsp.buf.code_action, "Code action", { "n", "x" })
 
@@ -258,6 +227,7 @@ require("lazy").setup({
 					end
 				end,
 			})
+
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
 
@@ -266,15 +236,13 @@ require("lazy").setup({
 				gopls = {},
 				pyright = {},
 				rust_analyzer = {},
-				ts_ls = {},
-
+				ts_ls = {
+					filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+				},
 				lua_ls = {
 					settings = {
 						Lua = {
-							completion = {
-								callSnippet = "Replace",
-							},
-							-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+							completion = { callSnippet = "Replace" },
 							-- diagnostics = { disable = { 'missing-fields' } },
 						},
 					},
@@ -284,10 +252,7 @@ require("lazy").setup({
 			require("mason").setup()
 
 			local ensure_installed = vim.tbl_keys(servers or {})
-			vim.list_extend(ensure_installed, {
-				"stylua",
-				"black",
-			})
+			vim.list_extend(ensure_installed, { "stylua", "black", "prettierd", "prettier" })
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			require("mason-lspconfig").setup({
@@ -301,6 +266,10 @@ require("lazy").setup({
 			})
 		end,
 	},
+
+	-- ========================================================================
+	-- Completion
+	-- ========================================================================
 	{
 		"saghen/blink.cmp",
 		event = "InsertEnter",
@@ -346,10 +315,41 @@ require("lazy").setup({
 				default = { "lsp", "path", "snippets", "buffer" },
 			},
 			completion = {
-				documentation = {
-					auto_show = true,
-					auto_show_delay_ms = 501,
+				menu = {
+					draw = {
+						components = {
+							kind_icon = {
+								text = function(ctx)
+									local icon = ctx.kind_icon
+									if ctx.item.source_name == "LSP" then
+										local color_item = require("nvim-highlight-colors").format(
+											ctx.item.documentation,
+											{ kind = ctx.kind }
+										)
+										if color_item and color_item.abbr ~= "" then
+											icon = color_item.abbr
+										end
+									end
+									return icon .. ctx.icon_gap
+								end,
+								highlight = function(ctx)
+									local highlight = "BlinkCmpKind" .. ctx.kind
+									if ctx.item.source_name == "LSP" then
+										local color_item = require("nvim-highlight-colors").format(
+											ctx.item.documentation,
+											{ kind = ctx.kind }
+										)
+										if color_item and color_item.abbr_hl_group then
+											highlight = color_item.abbr_hl_group
+										end
+									end
+									return highlight
+								end,
+							},
+						},
+					},
 				},
+				documentation = { auto_show = true, auto_show_delay_ms = 500 },
 			},
 			signature = { enabled = true },
 		},
@@ -374,17 +374,16 @@ require("lazy").setup({
 				local disable_filetypes = { c = false, cpp = false }
 				if disable_filetypes[vim.bo[bufnr].filetype] then
 					return nil
-				else
-					return {
-						timeout_ms = 501,
-						lsp_format = "fallback",
-					}
 				end
+				return { timeout_ms = 501, lsp_format = "fallback" }
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
 				python = { "black" },
 				javascript = { "prettierd", "prettier", stop_after_first = true },
+				typescript = { "prettierd", "prettier", stop_after_first = true },
+				typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+				javascriptreact = { "prettierd", "prettier", stop_after_first = true },
 			},
 		},
 	},
