@@ -16,6 +16,9 @@ require("lazy").setup({
 
 	{ "rose-pine/neovim" },
 	{ "folke/tokyonight.nvim" },
+	{ "loctvl842/monokai-pro.nvim" },
+	{ "rebelot/kanagawa.nvim" },
+	{ "vague-theme/vague.nvim" },
 
 	{
 		"nvim-tree/nvim-web-devicons",
@@ -33,6 +36,26 @@ require("lazy").setup({
 			-- 	topdelete = { text = "‾" },
 			-- 	changedelete = { text = "~" },
 			-- },
+		},
+	},
+	{
+		"NvChad/nvterm",
+		config = function()
+			require("nvterm").setup()
+		end,
+	},
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		opts = {},
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = false })
+				end,
+				desc = "Buffer Local Keymaps (which-key)",
+			},
 		},
 	},
 
@@ -90,7 +113,23 @@ require("lazy").setup({
 		---@type snacks.Config
 		opts = {
 			bigfile = { enabled = false },
-			dashboard = { enabled = true },
+			dashboard = {
+				enabled = true,
+				preset = {
+					header = [[
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠟⠛⠉⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⠋⠉⠀⠀⠀⠀⠀⠄⠒⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⢀⣀⠀⠀⠐⠆⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⢀⢠⣿⣿⠀⠀⡎⠂⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⢀⢘⢸⣿⣿⠀⠀⡄⡄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠈⠛⠨⣿⣿⠀⠀⣟⡄⠘⣿⣿⣿⣿⡿⠿⠛⠋⠉⢁⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠇⠀⠀⠁⡐⢿⣿⠀⠀⣶⠆⡀⠈⠉⠉⠁⠀⠀⠐⠁⠀⠀⢀⠀
+⠶⢿⣿⠿⣿⣿⠿⠿⠿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠿⠛⠛⠉⠉⢀⣀⣀⠰⠾⡌⠄⠀⣀⣨⠴⡤⠒⠓⠀⠄⢒⢶⡐⡦⠒⠀⡈⠙⠉⠀
+⠀⠀⠉⠉⠈⠈⠉⠉⠁⠀⠀⢈⣀⣀⣈⣠⡤⠤⠂⠀⠲⠚⣁⣀⠀⡀⣀⢀⣠⠖⠞⠈⠉⠁⠀⠄⠀⠤⠤⣶⣿⠿⢷⡄⠐⠐⠈⠁⠈⠀
+⣠⣤⣶⣶⣿⣿⣿⣷⡶⡟⡻⠛⠋⠀⠈⠉⠈⢀⣌⠡⠥⠠⠈⠉⠅⠛⢉⠀⠀⠀⢀⠀⢀⣀⣤⠐⠛⠛⢁⣀⡀⡤⡀⠀⠠⠀⠀⠀⠀⠀
+      ]],
+				},
+			},
 			explorer = { enabled = true },
 			indent = { enabled = true },
 			input = { enabled = true },
