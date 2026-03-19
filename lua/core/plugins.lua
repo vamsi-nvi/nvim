@@ -18,8 +18,53 @@ require("lazy").setup({
 	{ "folke/tokyonight.nvim" },
 	{ "loctvl842/monokai-pro.nvim" },
 	{ "rebelot/kanagawa.nvim" },
-	{ "vague-theme/vague.nvim" },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		lazy = false,
+		build = ":TSUpdate",
+		branch = "main",
+		config = function()
+			local parsers = {
+				"bash",
+				"c",
+				"diff",
+				"html",
+				"lua",
+				"luadoc",
+				"markdown",
+				"markdown_inline",
+				"query",
+				"vim",
+				"vimdoc",
+				"go",
+				"rust",
+			}
+			require("nvim-treesitter").install(parsers)
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					local buf, filetype = args.buf, args.match
 
+					local language = vim.treesitter.language.get_lang(filetype)
+					if not language then
+						return
+					end
+
+					if not vim.treesitter.language.add(language) then
+						return
+					end
+					vim.treesitter.start(buf, language)
+
+					-- enables treesitter based folds
+					-- for more info on folds see `:help folds`
+					-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+					-- vim.wo.foldmethod = "expr"
+
+					-- enables treesitter based indentation
+					vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				end,
+			})
+		end,
+	},
 	{
 		"nvim-tree/nvim-web-devicons",
 		lazy = false,
@@ -29,13 +74,13 @@ require("lazy").setup({
 	{
 		"lewis6991/gitsigns.nvim",
 		opts = {
-			-- signs = {
-			-- 	add = { text = "+" },
-			-- 	change = { text = "~" },
-			-- 	delete = { text = "_" },
-			-- 	topdelete = { text = "‾" },
-			-- 	changedelete = { text = "~" },
-			-- },
+			signs = {
+				add = { text = "+" },
+				change = { text = "~" },
+				delete = { text = "_" },
+				topdelete = { text = "‾" },
+				changedelete = { text = "~" },
+			},
 		},
 	},
 	{
@@ -414,7 +459,7 @@ require("lazy").setup({
 				if disable_filetypes[vim.bo[bufnr].filetype] then
 					return nil
 				end
-				return { timeout_ms = 501, lsp_format = "fallback" }
+				return { timeout_ms = 500, lsp_format = "fallback" }
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
